@@ -15,22 +15,35 @@ To set up the Deal Importer project, follow these steps:
 1. Clone the project repository from GitHub.
 2. Install Java, Maven, and Docker if not already installed.
 3. Set up a MySQL database and create a `deals` table with the following schema:
+Change the username and password to your desired info.
 
-   ```sql
-   CREATE TABLE deals (
-       deal_unique_id VARCHAR(255) PRIMARY KEY,
-       from_currency_iso_code VARCHAR(3) NOT NULL,
-       to_currency_iso_code VARCHAR(3) NOT NULL,
-       deal_timestamp BIGINT NOT NULL,
-       deal_amount DOUBLE NOT NULL
-   );
+```
+CREATE DATABASE IF NOT EXISTS ClusteredDH_Db;
+   USE ClusteredDH_Db;
+
+CREATE TABLE IF NOT EXISTS deals (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    deal_unique_id VARCHAR(255) UNIQUE NOT NULL,
+    from_currency_iso_code VARCHAR(3) NOT NULL,
+    to_currency_iso_code VARCHAR(3) NOT NULL,
+    deal_timestamp BIGINT NOT NULL,
+    deal_amount DOUBLE NOT NULL
+);
+
+
+CREATE USER 'ClusteredDH'@'localhost' IDENTIFIED BY 'ClusteredDH';
+
+GRANT ALL PRIVILEGES ON ClusteredDH_Db.* TO 'ClusteredDH'@'localhost';
+
+```
+  
 Update the database.properties file in the src/main/resources directory with your database connection details:
-makefile
-'''
+
+```
 url=jdbc:mysql://localhost:3306/ClusteredDH_Db
 user=ClusteredDH
 password=ClusteredDH
----
+```
 
 Build and run the project using IntelliJ IDEA or any Java IDE.
 Or you can use the Docker file.
