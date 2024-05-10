@@ -9,6 +9,24 @@ The Deal Importer project is a Java application that provides functionality for 
 - Maven
 - Docker
 
+## Classes and Packages
+### Deal Class
+Represents a deal with properties such as dealUniqueId, fromCurrencyISOCode, toCurrencyISOCode, dealTimestamp, and dealAmount.
+Includes constructors, getters, and setters.
+### DealDAO Class
+Manages database operations for deals, including saving deals to the database and checking for duplicate deals.
+### DealValidator Class
+Validates deals before saving them, checking for null or empty fields, duplicate deal IDs, and valid ISO codes.
+### Database Schema
+```
+Deals Table:
+deal_unique_id (VARCHAR)
+from_currency_iso_code (VARCHAR)
+to_currency_iso_code (VARCHAR)
+deal_timestamp (BIGINT)
+deal_amount (DOUBLE)
+```
+
 ## Setup
 To set up the Deal Importer project, follow these steps:
 
