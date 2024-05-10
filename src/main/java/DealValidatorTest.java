@@ -10,7 +10,7 @@ public class DealValidatorTest {
     @Test
     public void testValidateDeal_ValidAndSaveDeal() {
         DealValidator validator = new DealValidator();
-        Deal validDeal = new Deal("123", "USD", "EUR", System.currentTimeMillis(), 100.0);
+        Deal validDeal = new Deal("12223", "USD", "EUR", System.currentTimeMillis(), 100.0);
         Assert.assertTrue(validator.validateAndSaveDeal(validDeal));
     }
 

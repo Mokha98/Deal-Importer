@@ -1,25 +1,34 @@
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DealDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/ClusteredDH_Db";
-    private static final String USER = "ClusteredDH";
-    private static final String PASSWORD = "ClusteredDH";
     private static final Logger logger = Logger.getLogger(DealValidator.class.getName());
+    private static final Properties properties = new Properties();
+
+    static {
+        try (InputStream inputStream = DealDAO.class.getClassLoader().getResourceAsStream("database.properties")) {
+            properties.load(inputStream);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Failed to load database properties file.", e);
+        }
+    }
 
     public void saveDeal(Deal deal) {
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-            String sql =
-                    "INSERT INTO deals (deal_unique_id, from_currency_iso_code, to_currency_iso_code, deal_timestamp, deal_amount) VALUES (?, ?, ?, ?, ?)";
+        try (Connection conn = DriverManager.getConnection(properties.getProperty("url"),
+                properties.getProperty("user"),
+                properties.getProperty("password"))) {
+            String sql = "INSERT INTO deals (deal_unique_id, from_currency_iso_code, to_currency_iso_code, deal_timestamp, deal_amount) VALUES (?, ?, ?, ?, ?)";
             ExecuteInsertDeal(deal, conn, sql);
         } catch (SQLException e) {
-            LogSQLException( e);
+            LogSQLException(e);
         }
     }
 
@@ -31,34 +40,29 @@ public class DealDAO {
             pstmt.setLong(4, deal.getDealTimestamp());
             pstmt.setDouble(5, deal.getDealAmount());
             pstmt.executeUpdate();
-        }
-        catch (SQLException e) {
-            LogSQLException( e);
+        } catch (SQLException e) {
+            LogSQLException(e);
         }
     }
 
     public void saveDeals(Collection<Deal> deals) {
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
-
-            String sql =
-                    "INSERT INTO deals (deal_unique_id, from_currency_iso_code, to_currency_iso_code, deal_timestamp, deal_amount) VALUES (?, ?, ?, ?, ?)";
-
-
-            for (Deal deal : deals)
-            {
+        try (Connection conn = DriverManager.getConnection(properties.getProperty("url"),
+                properties.getProperty("user"),
+                properties.getProperty("password"))) {
+            String sql = "INSERT INTO deals (deal_unique_id, from_currency_iso_code, to_currency_iso_code, deal_timestamp, deal_amount) VALUES (?, ?, ?, ?, ?)";
+            for (Deal deal : deals) {
                 ExecuteInsertDeal(deal, conn, sql);
             }
-
-
         } catch (SQLException e) {
-            LogSQLException( e);
-
+            LogSQLException(e);
         }
     }
 
     public boolean doesDealExist(String dealUniqueId) {
         boolean dealExists = false;
-        try (Connection conn = DriverManager.getConnection(URL, USER, PASSWORD)) {
+        try (Connection conn = DriverManager.getConnection(properties.getProperty("url"),
+                properties.getProperty("user"),
+                properties.getProperty("password"))) {
             String sql = "SELECT COUNT(*) FROM deals WHERE deal_unique_id = ?";
             try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
                 pstmt.setString(1, dealUniqueId);
@@ -70,13 +74,12 @@ public class DealDAO {
                 }
             }
         } catch (SQLException e) {
-            LogSQLException( e);
+            LogSQLException(e);
         }
         return dealExists;
     }
 
-    private void LogSQLException(SQLException e)
-    {
+    private void LogSQLException(SQLException e) {
         String message;
 
         StringWriter sw = new StringWriter();
@@ -89,8 +92,6 @@ public class DealDAO {
                 "\n" + "ErrorCode: " + e.getErrorCode() +
                 "\n" + "StackTrace: " + sStackTrace;
 
-
         logger.log(Level.SEVERE, message);
-
     }
 }
